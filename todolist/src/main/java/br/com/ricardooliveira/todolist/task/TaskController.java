@@ -1,11 +1,13 @@
 package br.com.ricardooliveira.todolist.task;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +20,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class TaskController {
 
     @Autowired
-    private ITaskRepository iTaskRepository;
+    private ITaskRepository taskRepository;
 
     @PostMapping("/")
     public ResponseEntity create(@RequestBody TaskModel taskModel, HttpServletRequest request) {
@@ -33,8 +35,14 @@ public class TaskController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A data de término devem ser maior que a data de início");       
         }
         
-        var task = this.iTaskRepository.save(taskModel);
+        var task = this.taskRepository.save(taskModel);
         return ResponseEntity.status(HttpStatus.OK).body(task);
-    }    
-
+    }
+    
+    @GetMapping("/")
+    public List<TaskModel> list(HttpServletRequest request) {
+        var idUser = request.getAttribute("idUser");
+        var tasks = this.taskRepository.findAllByIdUser((UUID) idUser);
+        return tasks;
+    }
 }
