@@ -34,8 +34,8 @@ public class FilterTaskAuth extends OncePerRequestFilter {
             String[] credentials = authString.split(":");
             String username = credentials[0];
             String password = credentials[1];
-            System.out.println(username +" "+ password);
-
+    
+            
             //validar usuario
             var user = this.userRepository.findByUsername(username);
             if (user == null) {
@@ -44,6 +44,7 @@ public class FilterTaskAuth extends OncePerRequestFilter {
                 //validar senha
                 var passwordVerify = BCrypt.verifyer().verify(password.toCharArray(), user.getPassword());
                 if (passwordVerify.verified) {
+                    request.setAttribute("idUser", user.getId());
                     filterChain.doFilter(request, response);
                 } else {
                     response.sendError(401); //usuario nao autorizado
